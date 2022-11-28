@@ -12,8 +12,9 @@ uint8_t tree_size = 0;
 void count_frequency(char* string, Node* tree)
 {
 	uint8_t found = 0;
+	uint8_t size = strlen(string);
 
-	for (uint8_t i = 0; i < STRING_SIZE - 1; ++i)
+	for (uint8_t i = 0; i < size; ++i)
 	{
 		found = 0;
 		for (uint8_t j = 0; j < tree_size; ++j)
@@ -82,55 +83,78 @@ void create_parents(Node* tree)
 	}
 }
 
-void create_code(Node* tree, char* output)
+uint8_t get_index(Node* tree, char symbol)
+{
+	for (uint8_t i = 0; i < number_of_symbols; ++i)
+	{
+		if (tree[i].symbol == symbol)
+			return i;
+	}
+	return 0;
+}
+
+void create_code(Node* tree, char* input, char* output)
 {
 	char buffer[4] = { '\0' };
 	uint8_t buffer_index = 0;
+
+	uint8_t tree_index = 0;
 	uint8_t current_index = 0;
 	uint8_t prev_index = 0;
 
 	uint8_t output_shift = 0;
+	uint8_t size = 0;
 
-	for (uint8_t i = 0; i < number_of_symbols; ++i)
+	uint8_t input_size = strlen(input);
+	for (uint8_t i = 0; i < input_size; ++i)
 	{
-		current_index = i;
-		prev_index = i;
+		prev_index = current_index = tree_index = get_index(tree, input[i]);
 
 		buffer_index = 0;
 		for (uint8_t k = 0; k < 4; ++k)
 			buffer[k] = '\0';
 
-		while (tree[current_index].parent)
+		if (number_of_symbols == 1)
 		{
-			current_index = tree[current_index].parent;
-
-			if (prev_index == tree[current_index].left)
-				buffer[buffer_index] = '0';
-			else if (prev_index == tree[current_index].right)
-				buffer[buffer_index] = '1';
-
-			prev_index = current_index;
-			buffer_index += 1;
+			buffer[0] = '0';
+			size = 1;
 		}
-
-		// Перевертыш
-		uint8_t size = strlen(buffer);
-		for (uint8_t k1 = 0, k2 = size - 1; k1 < k2; ++k1, --k2)
+		else
 		{
-			char code = buffer[k1];
-			buffer[k1] = buffer[k2];
-			buffer[k2] = code;
-		}
 
+			while (tree[current_index].parent)
+			{
+				current_index = tree[current_index].parent;
+
+				if (prev_index == tree[current_index].left)
+					buffer[buffer_index] = '0';
+				else if (prev_index == tree[current_index].right)
+					buffer[buffer_index] = '1';
+
+				prev_index = current_index;
+				buffer_index += 1;
+			}
+
+			// Перевертыш
+			size = strlen(buffer);
+			for (uint8_t k1 = 0, k2 = size - 1; k1 < k2; ++k1, --k2)
+			{
+				char code = buffer[k1];
+				buffer[k1] = buffer[k2];
+				buffer[k2] = code;
+			}
+		}
+		
 		memcpy(output + output_shift, buffer, size);
 		output_shift += size;
-		printf("%c - %s\n", tree[i].symbol, buffer);
+
+		printf("%c - %s\n", tree[tree_index].symbol, buffer);
 	}
 }
 
 int main()
 {
-	char input_string[STRING_SIZE] = { "qwerty" };
+	char input_string[STRING_SIZE] = { "aaaaa" };
 	Node tree[TREE_SIZE];
 
 	count_frequency(input_string, tree);
@@ -144,7 +168,7 @@ int main()
 	printf("\n");
 	
 	char code_string[17] = { '\0' };
-	create_code(tree, code_string);
+	create_code(tree, input_string, code_string);
 	printf("\nCode: %s", code_string);
 
 	return 0;
