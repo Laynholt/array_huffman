@@ -82,12 +82,14 @@ void create_parents(Node* tree)
 	}
 }
 
-void create_code(Node* tree)
+void create_code(Node* tree, char* output)
 {
 	char buffer[4] = { '\0' };
 	uint8_t buffer_index = 0;
 	uint8_t current_index = 0;
 	uint8_t prev_index = 0;
+
+	uint8_t output_shift = 0;
 
 	for (uint8_t i = 0; i < number_of_symbols; ++i)
 	{
@@ -120,6 +122,8 @@ void create_code(Node* tree)
 			buffer[k2] = code;
 		}
 
+		memcpy(output + output_shift, buffer, size);
+		output_shift += size;
 		printf("%c - %s\n", tree[i].symbol, buffer);
 	}
 }
@@ -138,7 +142,10 @@ int main()
 
 	create_parents(tree);
 	printf("\n");
-	create_code(tree);
+	
+	char code_string[17] = { '\0' };
+	create_code(tree, code_string);
+	printf("\nCode: %s", code_string);
 
 	return 0;
 }
