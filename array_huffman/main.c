@@ -6,6 +6,10 @@
 #define STRING_SIZE 7
 #define TREE_SIZE (STRING_SIZE - 1) * 2 - 1
 
+// if we have <=6 diefferent variables in string
+#define BUFFER_SIZE 4
+#define OUTPUT_SIZE 17
+
 uint8_t number_of_symbols = 0;
 uint8_t tree_size = 0;
 
@@ -95,7 +99,7 @@ uint8_t get_index(Node* tree, char symbol)
 
 void create_code(Node* tree, char* input, char* output)
 {
-	char buffer[4] = { '\0' };
+	char buffer[BUFFER_SIZE] = { '\0' };
 	uint8_t buffer_index = 0;
 
 	uint8_t tree_index = 0;
@@ -111,7 +115,7 @@ void create_code(Node* tree, char* input, char* output)
 		prev_index = current_index = tree_index = get_index(tree, input[i]);
 
 		buffer_index = 0;
-		for (uint8_t k = 0; k < 4; ++k)
+		for (uint8_t k = 0; k < BUFFER_SIZE; ++k)
 			buffer[k] = '\0';
 
 		if (number_of_symbols == 1)
@@ -121,7 +125,6 @@ void create_code(Node* tree, char* input, char* output)
 		}
 		else
 		{
-
 			while (tree[current_index].parent)
 			{
 				current_index = tree[current_index].parent;
@@ -154,7 +157,7 @@ void create_code(Node* tree, char* input, char* output)
 
 int main()
 {
-	char input_string[STRING_SIZE] = { "aaaaa" };
+	char input_string[STRING_SIZE] = { "abcdf" };
 	Node tree[TREE_SIZE];
 
 	count_frequency(input_string, tree);
@@ -167,7 +170,7 @@ int main()
 	create_parents(tree);
 	printf("\n");
 	
-	char code_string[17] = { '\0' };
+	char code_string[OUTPUT_SIZE] = { '\0' };
 	create_code(tree, input_string, code_string);
 	printf("\nCode: %s", code_string);
 
